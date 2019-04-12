@@ -21,26 +21,6 @@ class Queue:
     def size(self):
         return len(self.items)
 
-class Graph:
-
-    def __init__(self):
-        self.items = []
-
-    def isEmpty(self):
-        return self.items == []
-
-    def enqueue(self, item):
-        self.items.append(item)
-
-    def dequeue(self):
-        if self.size() > 0:
-            return self.items.pop(0)
-        else:
-            return None
-
-    def size(self):
-        return len(self.items)
-
 
 class Stack:
     def __init__(self):
