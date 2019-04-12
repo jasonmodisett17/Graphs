@@ -1,6 +1,7 @@
 from room import Room
 from player import Player
 from world import World
+from collections import deque
 
 import random
 
@@ -20,6 +21,105 @@ player = Player("Name", world.startingRoom)
 
 traversalPath = ['n', 's']
 
+# Stack
+class Stack():
+    def __init__(self):
+        self.stack = []
+
+    def push(self, value):
+        self.stack.append(value)
+
+    def pop(self):
+        if self.size() > 0:
+            return self.stack.pop()
+        else:
+            return None
+
+    def size(self):
+        return len(self.stack)
+
+
+def other_direction(direction):
+    if direction == "s":
+        return "n"
+    elif direction == "n":
+        return "s"
+    elif direction == "e":
+        return "w"
+    elif direction == "w":
+        return "e"
+
+
+s = Stack()
+traversalGraph = {}
+
+
+while len(traversalGraph) < len(roomGraph):
+    exits = {}
+
+    if player.currentRoom.id not in traversalGraph:
+
+        for exit in player.currentRoom.getExits():
+            exits[exit] = '?'
+
+        traversalGraph[player.currentRoom.id] = exits
+
+    # Get available exit in the current room
+    exits = traversalGraph[player.currentRoom.id]
+    open_exits = False
+
+    for direction, exit_room in exits.items():
+
+        if exit_room == '?':
+            # Go to room and check for exit
+            player.travel(direction)
+            traversalPath.append(direction)
+
+            exits[direction] = player.currentRoom.id
+
+            # If room is not there, add a new room
+            if exits[direction] not in traversalGraph:
+
+                # Checking the room for exits
+                room_exit = {}
+                for exits in player.currentRoom.getExits():
+                    room_exit[exits] = '?'
+
+                # Reassign current room
+                room_exit[other_direction(direction)] = player.currentRoom.id
+
+            else:
+                # Show the existing room we came from
+                traversalGraph[exits[direction]][other_direction(direction)] = player.currentRoom.id
+                open_exits = True
+
+                if open_exits:
+                    # If room exists, go back to the previous room/direction
+                    player.travel(other_direction(direction))
+                    traversalPath.pop()
+
+                    continue
+
+                # Exploring more exits
+                for direction, exit in traversalGraph[exits[direction]].items():
+                    if exit == '?': # If no exits marked, travel again
+                        open_exits = False
+
+            s.push(other_direction(direction))  # Adding to the stack to travel back to if need be
+
+            open_exits = True  # An exit was found
+            break
+
+    if not open_exits:  # We've already been in this room, pop off the stack
+        going_back = s.pop()
+
+        # Breaking the loop and going back to the original room
+        if going_back == None:
+            break
+
+        player.travel(going_back)
+        traversalPath.append(going_back)
+
 
 # TRAVERSAL TEST
 visited_rooms = set()
@@ -30,7 +130,10 @@ for move in traversalPath:
     visited_rooms.add(player.currentRoom)
 
 if len(visited_rooms) == len(roomGraph):
+    print('')
     print(f"TESTS PASSED: {len(traversalPath)} moves, {len(visited_rooms)} rooms visited")
+    print('')
+    print(traversalPath)
 else:
     print("TESTS FAILED: INCOMPLETE TRAVERSAL")
     print(f"{len(roomGraph) - len(visited_rooms)} unvisited rooms")
