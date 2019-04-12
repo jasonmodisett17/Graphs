@@ -18,15 +18,7 @@ roomGraph={494: [(1, 8), {'e': 457}], 492: [(1, 20), {'e': 400}], 493: [(2, 5), 
 world.loadGraph(roomGraph)
 player = Player("Name", world.startingRoom)
 
-
-
-
-# FILL THIS IN
 traversalPath = ['n', 's']
-
-
-
-
 
 
 # TRAVERSAL TEST

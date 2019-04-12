@@ -2,9 +2,7 @@
 Simple graph implementation
 """
 
-
-class Graph:
-
+class Queue:
     def __init__(self):
         self.items = []
 
